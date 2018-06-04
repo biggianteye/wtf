@@ -63,9 +63,11 @@ func (widget *Widget) Fetch(cityIDs []int) []*owm.CurrentWeatherData {
 
 	for _, cityID := range cityIDs {
 		result, err := widget.currentWeather(widget.APIKey, cityID)
-		if err == nil {
-			data = append(data, result)
+		if err != nil {
+			return data
 		}
+
+		data = append(data, result)
 	}
 
 	return data
@@ -78,7 +80,9 @@ func (widget *Widget) Refresh() {
 		return
 	}
 
-	widget.Data = widget.Fetch(wtf.ToInts(Config.UList("wtf.mods.weather.cityids", widget.defaultCityCodes())))
+	if widget.APIKey != "" {
+		widget.Data = widget.Fetch(wtf.ToInts(Config.UList("wtf.mods.weather.cityids", widget.defaultCityCodes())))
+	}
 
 	widget.UpdateRefreshedAt()
 	widget.display()
